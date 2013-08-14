@@ -163,9 +163,11 @@ WS.MultiVersionWebsocketServer = Server.extend({
                         self.connection_callback(c);
                     }
                     self.addConnection(c);
+                    log.debug("add connection from ws!");
                 }
                 catch(e) {
                     console.log("WebSocket Request unsupported by WebSocket-Node: " + e.toString());
+                    log.error("oops! WebSocket Request unsupported by WebSocket-Node: " + e.toString());
                     return;
                 }
             } else {
@@ -174,6 +176,7 @@ WS.MultiVersionWebsocketServer = Server.extend({
                     (req.headers.upgrade && req.headers.connection) &&
                     req.headers.upgrade.toLowerCase() === 'websocket' &&
                     req.headers.connection.toLowerCase() === 'upgrade') {
+                    log.debug("using miksagoConnection");
                     new miksagoConnection(self._miksagoServer.manager, self._miksagoServer.options, req, socket, head);
                 }
             }
@@ -227,6 +230,7 @@ WS.worlizeWebSocketConnection = Connection.extend({
         });
         
         this._connection.on('close', function(connection) {
+            log.debug("connection "+self.id+" close");
             if(self.close_callback) {
                 self.close_callback();
             }

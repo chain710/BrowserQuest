@@ -1230,6 +1230,15 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
                         }
                     } else {
                         log.debug("Character "+entity.id+" already exists. Don't respawn.");
+                        // dont respawn, but create attack link
+                        if(entity instanceof Mob) {
+                            if(targetId) {
+                                var player = self.getEntityById(targetId);
+                                if(player) {
+                                    self.createAttackLink(entity, player);
+                                }
+                            }
+                        }
                     }
                 });
 
@@ -1269,7 +1278,7 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
                     }
                 });
 
-                self.client.onEntityMove(function(id, x, y) {
+                self.client.onEntityMove(function(id, x, y, engage) {
                     var entity = null;
 
                     if(id !== self.playerId) {
@@ -1279,9 +1288,13 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
                             if(self.player.isAttackedBy(entity)) {
                                 self.tryUnlockingAchievement("COWARD");
                             }
-                            entity.disengage();
-                            entity.idle();
-                            self.makeCharacterGoTo(entity, x, y);
+
+                            if (!engage) {
+                                entity.disengage();
+                                entity.idle();
+                            }
+
+                            self.makeCharacterGoTo(entity, x, y, engage);
                         }
                     }
                 });
@@ -1538,9 +1551,9 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
          * @param {Number} x The x coordinate of the target location.
          * @param {Number} y The y coordinate of the target location.
          */
-        makeCharacterGoTo: function(character, x, y) {
+        makeCharacterGoTo: function(character, x, y, disengage) {
             if(!this.map.isOutOfBounds(x, y)) {
-                character.go(x, y);
+                character.go(x, y, disengage);
             }
         },
     

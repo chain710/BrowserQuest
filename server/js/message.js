@@ -37,7 +37,8 @@ Messages.Move = Message.extend({
         return [Types.Messages.MOVE,
                 this.entity.id,
                 this.entity.x,
-                this.entity.y];
+                this.entity.y,
+                1];
     }
 });
 

@@ -27,7 +27,7 @@ module.exports = Player = Character.extend({
         this.connection.listen(function(message) {
             var action = parseInt(message[0]);
             
-            log.debug("Received: "+message);
+            log.debug("Received: "+JSON.stringify(message)+" Type:"+typeof(message));
             if(!check(message)) {
                 self.connection.close("Invalid "+Types.getMessageTypeAsString(action)+" message format: "+message);
                 return;
@@ -52,9 +52,11 @@ module.exports = Player = Character.extend({
                 // (also enforced by the maxlength attribute of the name input element).
                 self.name = (name === "") ? "lorem ipsum" : name.substr(0, 15);
                 
-                self.kind = Types.Entities.WARRIOR;
+                self.kind = Types.Entities.WARRIOR; //Types.Entities.WARRIOR;
                 self.equipArmor(message[2]);
                 self.equipWeapon(message[3]);
+                //self.equipArmor(Types.Entities.GOLDENARMOR);
+                //self.equipWeapon(Types.Entities.GOLDENSWORD);
                 self.orientation = Utils.randomOrientation();
                 self.updateHitPoints();
                 self.updatePosition();
@@ -159,6 +161,7 @@ module.exports = Player = Character.extend({
                         self.server.removeEntity(item);
                         
                         if(kind === Types.Entities.FIREPOTION) {
+                            // easter egg
                             self.updateHitPoints();
                             self.broadcast(self.equip(Types.Entities.FIREFOX));
                             self.firepotionTimeout = setTimeout(function() {
@@ -261,6 +264,8 @@ module.exports = Player = Character.extend({
     },
     
     send: function(message) {
+        var self = this;
+        log.debug("send msg to player "+self.id+" "+JSON.stringify(message));
         this.connection.send(message);
     },
     

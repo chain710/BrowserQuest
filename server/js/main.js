@@ -43,7 +43,7 @@ function main(config) {
                     world.connect_callback(new Player(connection, world));
                 }
             };
-        
+        log.debug("we got a new player!");
         if(metrics) {
             metrics.getOpenWorldCount(function(open_world_count) {
                 // choose the least populated world among open worlds

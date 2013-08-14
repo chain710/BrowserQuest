@@ -84,7 +84,8 @@ define(['player', 'entityfactory', 'lib/bison'], function(Player, EntityFactory,
                         self.isTimeout = true;
                         return;
                     }
-                    
+
+                    console.log("ws recv: " + e.data);
                     self.receiveMessage(e.data);
                 };
 
@@ -176,10 +177,11 @@ define(['player', 'entityfactory', 'lib/bison'], function(Player, EntityFactory,
         receiveMove: function(data) {
             var id = data[1],
                 x = data[2],
-                y = data[3];
-        
+                y = data[3],
+                engage = data[4];
+
             if(this.move_callback) {
-                this.move_callback(id, x, y);
+                this.move_callback(id, x, y, engage);
             }
         },
     
@@ -501,7 +503,7 @@ define(['player', 'entityfactory', 'lib/bison'], function(Player, EntityFactory,
     
         sendHurt: function(mob) {
             this.sendMessage([Types.Messages.HURT,
-                              mob.id]);
+                              mob.id, mob.gridX, mob.gridY]);
         },
     
         sendChat: function(text) {

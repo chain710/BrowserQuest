@@ -52,6 +52,7 @@ module.exports = World = cls.Class.extend({
         this.onPlayerConnect(function(player) {
             player.onRequestPosition(function() {
                 if(player.lastCheckpoint) {
+                    log.debug("---------------we have checkpoint---------------");
                     return player.lastCheckpoint.getRandomPosition();
                 } else {
                     return self.map.getRandomStartingPosition();
@@ -261,6 +262,7 @@ module.exports = World = cls.Class.extend({
     
     pushToPlayer: function(player, message) {
         if(player && player.id in this.outgoingQueues) {
+            log.debug("send msg to player "+player.id+" "+message.serialize());
             this.outgoingQueues[player.id].push(message.serialize());
         } else {
             log.error("pushToPlayer: player was undefined");
@@ -576,6 +578,7 @@ module.exports = World = cls.Class.extend({
                 pos = self.map.tileIndexToGridPosition(tid);
             
             if(Types.isNpc(kind)) {
+                log.debug("add npc tid="+tid+" x="+pos.x+" y="+pos.y);
                 self.addNpc(kind, pos.x + 1, pos.y);
             }
             if(Types.isMob(kind)) {
@@ -782,10 +785,15 @@ module.exports = World = cls.Class.extend({
             this.map.forEachGroup(function(id) {
                 var spawns = [];
                 if(self.groups[id].incoming.length > 0) {
+                    // bug: dependency check, workaround: first player then others
                     spawns = _.each(self.groups[id].incoming, function(entity) {
                         if(entity instanceof Player) {
                             self.pushToGroup(id, new Messages.Spawn(entity), entity.id);
-                        } else {
+                        }
+                    });
+
+                    spawns = _.each(self.groups[id].incoming, function(entity) {
+                        if(!(entity instanceof Player)) {
                             self.pushToGroup(id, new Messages.Spawn(entity));
                         }
                     });

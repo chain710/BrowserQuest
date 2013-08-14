@@ -311,14 +311,18 @@ define(['entity', 'transition', 'timer'], function(Entity, Transition, Timer) {
         /**
          * 
          */
-        go: function(x, y) {
-    	    if(this.isAttacking()) {
-                this.disengage();
+        go: function(x, y, engage) {
+            engage = undefined || engage;
+            if (!engage) {
+                if(this.isAttacking()) {
+                    this.disengage();
+                }
+                else if(this.followingMode) {
+                    this.followingMode = false;
+                    this.target = null;
+                }
             }
-            else if(this.followingMode) {
-                this.followingMode = false;
-                this.target = null;
-            }
+
             this.moveTo_(x, y);
         },
     
